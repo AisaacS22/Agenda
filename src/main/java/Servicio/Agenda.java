@@ -1,10 +1,9 @@
+package Servicio;
+
 import Modelo.Contacto;
 import Modelo.NodoContacto;
+import java.time.LocalDate;
 
-/**
- * La clase Agenda maneja una agenda de contactos usando un árbol binario de búsqueda.
- * Permite agregar, buscar, eliminar y mostrar contactos.
- */
 public class Agenda {
     private NodoContacto raiz;
 
@@ -15,24 +14,21 @@ public class Agenda {
     /**
      * Agrega un nuevo contacto a la agenda.
      *
-     * @param nombre   Nombre del contacto.
+     * @param nombre Nombre del contacto.
      * @param telefono Teléfono del contacto.
+     * @param correoElectronico Correo electrónico del contacto.
+     * @param fechaNacimiento Fecha de nacimiento del contacto.
      */
-    public void agregarContacto(String nombre, String telefono) {
-        Contacto nuevoContacto = new Contacto(nombre, telefono);
+    public void agregarContacto(String nombre, long telefono, String correoElectronico, LocalDate fechaNacimiento) {
+        Contacto nuevoContacto = new Contacto(nombre, telefono, correoElectronico, fechaNacimiento);
         if (this.raiz == null) {
             this.raiz = new NodoContacto(nuevoContacto);
         } else {
-            insertar(this.raiz, nuevoContacto);
+            this.insertar(this.raiz, nuevoContacto);
         }
     }
 
-    /**
-     * Inserta un contacto en el árbol binario de búsqueda.
-     *
-     * @param padre    Nodo actual en el árbol.
-     * @param contacto Contacto a insertar.
-     */
+    // Método para insertar un contacto en el árbol
     private void insertar(NodoContacto padre, Contacto contacto) {
         if (contacto.getNombre().compareTo(padre.getContacto().getNombre()) < 0) {
             if (padre.getIzdo() == null) {
@@ -59,13 +55,7 @@ public class Agenda {
         return buscar(this.raiz, nombre);
     }
 
-    /**
-     * Busca un contacto en el árbol binario de búsqueda.
-     *
-     * @param nodo   Nodo actual en el árbol.
-     * @param nombre Nombre del contacto a buscar.
-     * @return El contacto encontrado o null si no se encuentra.
-     */
+    // Método auxiliar para buscar un contacto en el árbol
     private Contacto buscar(NodoContacto nodo, String nombre) {
         if (nodo == null) {
             return null;
@@ -88,13 +78,7 @@ public class Agenda {
         this.raiz = eliminar(this.raiz, nombre);
     }
 
-    /**
-     * Elimina un nodo del árbol binario de búsqueda.
-     *
-     * @param nodo   Nodo actual en el árbol.
-     * @param nombre Nombre del contacto a eliminar.
-     * @return Nodo resultante después de la eliminación.
-     */
+    // Método auxiliar para eliminar un contacto en el árbol
     private NodoContacto eliminar(NodoContacto nodo, String nombre) {
         if (nodo == null) {
             return null;
@@ -104,28 +88,23 @@ public class Agenda {
         } else if (nombre.compareTo(nodo.getContacto().getNombre()) > 0) {
             nodo.setDcho(eliminar(nodo.getDcho(), nombre));
         } else {
-            // Nodo con solo un hijo o sin hijos
             if (nodo.getIzdo() == null) {
                 return nodo.getDcho();
             } else if (nodo.getDcho() == null) {
                 return nodo.getIzdo();
             }
 
-            // Nodo con dos hijos: Obtener el sucesor en orden (el menor en el subárbol derecho)
             NodoContacto temp = minValorNodo(nodo.getDcho());
             nodo.getContacto().setTelefono(temp.getContacto().getTelefono());
             nodo.getContacto().setNombre(temp.getContacto().getNombre());
+            nodo.getContacto().setCorreoElectronico(temp.getContacto().getCorreoElectronico());
+            nodo.getContacto().setFechaNacimiento(temp.getContacto().getFechaNacimiento());
             nodo.setDcho(eliminar(nodo.getDcho(), temp.getContacto().getNombre()));
         }
         return nodo;
     }
 
-    /**
-     * Encuentra el nodo con el valor mínimo en un subárbol.
-     *
-     * @param nodo Nodo inicial del subárbol.
-     * @return Nodo con el valor mínimo.
-     */
+    // Método auxiliar para encontrar el nodo con el valor mínimo en un subárbol
     private NodoContacto minValorNodo(NodoContacto nodo) {
         NodoContacto actual = nodo;
         while (actual.getIzdo() != null) {
@@ -141,15 +120,13 @@ public class Agenda {
         inOrden(this.raiz);
     }
 
-    /**
-     * Realiza un recorrido en orden del árbol binario de búsqueda.
-     *
-     * @param nodo Nodo actual en el árbol.
-     */
+    // Método auxiliar para mostrar todos los contactos en la agenda
     private void inOrden(NodoContacto nodo) {
         if (nodo != null) {
             inOrden(nodo.getIzdo());
-            System.out.println("Nombre: " + nodo.getContacto().getNombre() + ", Teléfono: " + nodo.getContacto().getTelefono());
+            Contacto c = nodo.getContacto();
+            System.out.println("Nombre: " + c.getNombre() + ", Teléfono: " + c.getTelefono() +
+                    ", Correo: " + c.getCorreoElectronico() + ", Fecha de Nacimiento: " + c.getFechaNacimiento());
             inOrden(nodo.getDcho());
         }
     }
